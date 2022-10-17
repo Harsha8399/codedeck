@@ -4,6 +4,10 @@ import {MdOutlineClose} from 'react-icons/md';
 import {BiEditAlt} from "react-icons/bi";
 import {ModalContext} from "../context/ModalContext";
 import {PlaygroundContext} from "../context/PlaygroundContext";
+import EditCardTitle from "./modalTypes/EditCardTitle";
+import EditFolderTitle from "./modalTypes/EditFolderTitle";
+import NewCard from "./modalTypes/NewCard";
+import NewFolder from "./modalTypes/NewFolder";
 
 const ModalContainer = styled.div`
     background: rgba(0,0,0,0.4);
@@ -23,12 +27,12 @@ const ModalContent = styled.div`
     padding: 2rem;
     border-radius: 2rem;
 `;
-const Header = styled.div`
+export const Header = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
 `;
-const CloseButton = styled.button`
+export const CloseButton = styled.button`
     background: transparent;
     outline: 0;
     border: 0;
@@ -36,7 +40,7 @@ const CloseButton = styled.button`
     cursor: pointer;
 
 `;
-const Input = styled.div`
+export const Input = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -56,31 +60,25 @@ const Input = styled.div`
     `;
 
 const EditCardModal = ({
-    setIsOpen,
+    closeModal,
     isOpen,
 }:{
-    setIsOpen: any;
+    closeModal: ()=>void;
     isOpen: any;
 })=>{
     const PlaygroundFeatures = useContext(PlaygroundContext)!;
     const folders = PlaygroundFeatures.folders;
+    console.log(isOpen);
 
     const currentFolder = folders[isOpen.identifier.folderId];
-    const currentCard = currentFolder.items[isOpen.identifier.cardId]
+    const currentCard = currentFolder.items[isOpen.identifier.cardId];
     
 return(
     <>
     <Header>
         <h2 className="Heading">Edit Cards title</h2>
         <CloseButton onClick={()=>{
-            setIsOpen({
-                value: false,
-                type: "",
-                identifier: {
-                    folderId:"",
-                    cardId: "",
-                }
-            })
+            closeModal();
         }}>
             <MdOutlineClose/>
         </CloseButton>
@@ -90,12 +88,20 @@ return(
         <button>Update Title</button>
     </Input>
     </>
-)
+);
 };
+
+export interface ModalProps{
+    closeModal:()=>void;
+    identifier: {
+        folderId: string;
+        cardId: string;
+    };
+}
 
 const Modal = () =>{
     const ModalFeatures = useContext(ModalContext)!;
-    const setIsOpen = ModalFeatures?.setIsOpen!;
+    const {closeModal } = ModalFeatures;
     const isOpen = ModalFeatures?.isOpen!;
     
 
@@ -103,7 +109,16 @@ const Modal = () =>{
         <ModalContainer>
             <ModalContent>
                 {isOpen.type==="1" &&(
-                    <EditCardModal setIsOpen={setIsOpen} isOpen={isOpen}/>
+                    <EditCardTitle closeModal={closeModal} identifier={isOpen.identifier}/>
+                )}
+                {isOpen.type==="2" &&(
+                    <EditFolderTitle closeModal={closeModal} identifier={isOpen.identifier}/>
+                )}
+                {isOpen.type==="3" &&(
+                    <NewCard closeModal={closeModal} identifier={isOpen.identifier}/>
+                )}
+                {isOpen.type==="4" &&(
+                    <NewFolder closeModal={closeModal} identifier={isOpen.identifier}/>
                 )}
             </ModalContent>
         </ModalContainer>

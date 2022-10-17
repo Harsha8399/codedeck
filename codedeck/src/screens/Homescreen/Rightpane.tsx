@@ -4,6 +4,7 @@ import { IoTrash } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
 // import {BiEditAlt} from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
+import {PlaygroundContext} from "../../context/PlaygroundContext";
 
 interface HeaderProps {
   readonly variant: string;
@@ -66,7 +67,8 @@ const AddButton = styled.button`
 
 const Folder = styled.div`
   margin-top: 0.5rem;
-`;
+  margin-bottom: 2rem;
+  `;
 
 const CardContainer = styled.div`
   display: grid;
@@ -98,97 +100,126 @@ const Icons = styled.div`
   display: flex;
   gap: 0.5rem;
   font-size: 1.25rem;
+  padding-right: 1rem;
 `;
+
+const FolderButtons = styled.div`
+  display: flex;
+  align-items: center;
+  `;
 
 const Rightpane = () => {
   const makeAvailableGlobally = useContext(ModalContext)!;
-  const setIsOpen = makeAvailableGlobally?.setIsOpen;
+  const {openModal} = makeAvailableGlobally;
+  console.log(openModal);
 
-  const Folders = {
-    ["1"]: {
-      title: "Title 1",
-      items: {
-        ["item1"]: {
-          title: "Stack Implementation",
-          language: "C++",
-        },
-        ["item2"]: {
-          title: "Queue Implementation",
-          language: "C++",
-        },
-        ["item3"]: {
-          title: "XYZ Implementation",
-          language: "C++",
-        },
-      },
-    },
-    ["2"]: {
-      title: "Folder Title 2",
-      items: {
-        ["item4"]: {
-          title: "1 Implementation",
-          language: "C++",
-        },
-        ["item5"]: {
-          title: "2 Implementation",
-          language: "C++",
-        },
-        ["item6"]: {
-          title: "3 Implementation",
-          language: "C++",
-        },
-      },
-    },
-  };
+  const PlaygroundFeatures = useContext(PlaygroundContext)!;
+  const Folders = PlaygroundFeatures?.folders;
+  const {deleteFolder,deleteCard} = PlaygroundFeatures;
 
   return (
+    
     <StyledRightPane>
+      {/* console.log(openModal); */}
       <Header variant="main">
         <Heading size="large">
           My <span>Playground</span>
         </Heading>
-        <AddButton>New folder</AddButton>
+        
+        {openModal &&<AddButton onClick={()=>{
+          
+          openModal({
+            value: true,
+            type: "4",
+            identifier:{
+              folderId: "",
+              cardId: "",
+            },
+          })
+        }}>
+          <span>+</span>New folder</AddButton>
+}
       </Header>
 
-      {Object.entries(Folders).map(([folderId, folder]) => (
-        <Folder>
-          <Header variant="folder">
-            <Heading size="large">Data Structures</Heading>
-            <AddButton>
-              <span>+</span>New Playground
-            </AddButton>
-          </Header>
-          <CardContainer>
-            {Object.entries(folder.items).map(([cardId, card]) => (
-              <PlaygroundCard>
-                <img
-                  src="https://i.pinimg.com/originals/1c/54/f7/1c54f7b06d7723c21afc5035bf88a5ef.png"
-                  alt="logo"
-                />
-                <CardContent>
-                  <h5>{card.title}</h5>
-                  <p>Language:{card.language}</p>
-                </CardContent>
+      {Object.entries(Folders).map(
+        ([folderId, folder]: [folderId: string, folder: any]) => (
+          <Folder>
+            <Header variant='folder'>
+              <Heading size='small'>{folder.title}</Heading>
+              <FolderButtons>
                 <Icons>
-                  <IoTrash />
+                  <IoTrash
+                    onClick={() => {
+                      // DELETE FOLDER
+                      deleteFolder(folderId);
+                    }}
+                  />
                   <FaEdit
                     onClick={() => {
-                      setIsOpen({
+                      openModal({
                         value: true,
-                        type: "1",
+                        type: "2",
                         identifier: {
                           folderId: folderId,
-                          cardId: cardId,
+                          cardId: "",
                         },
                       });
                     }}
                   />
                 </Icons>
-              </PlaygroundCard>
-            ))}
-          </CardContainer>
-        </Folder>
-      ))}
+                <AddButton
+                  onClick={() => {
+                    openModal({
+                      value: true,
+                      type: "3",
+                      identifier: {
+                        folderId: folderId,
+                        cardId: "",
+                      },
+                    });
+                  }}
+                >
+                  <span>+</span> New Playground
+                </AddButton>
+              </FolderButtons>
+            </Header>
+
+            <CardContainer>
+              {Object.entries(folder.items).map(
+                ([cardId, card]: [cardId: string, card: any]) => (
+                  <PlaygroundCard>
+                    <img src='/logo-small.png' alt='' />
+                    <CardContent>
+                      <h5>{card.title}</h5>
+                      <p>Language: {card.language}</p>
+                    </CardContent>
+                    <Icons>
+                      <IoTrash
+                        onClick={() => {
+                          // DELETE CARD
+                          deleteCard(folderId, cardId);
+                        }}
+                      />
+                      <FaEdit
+                        onClick={() => {
+                          openModal({
+                            value: true,
+                            type: "1",
+                            identifier: {
+                              folderId: folderId,
+                              cardId: cardId,
+                            },
+                          });
+                        }}
+                      />
+                    </Icons>
+                  </PlaygroundCard>
+                )
+              )}
+            </CardContainer>
+          </Folder>
+        )
+      )}
     </StyledRightPane>
   );
 };
