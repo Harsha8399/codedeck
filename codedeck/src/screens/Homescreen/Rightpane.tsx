@@ -5,6 +5,7 @@ import { FaEdit } from "react-icons/fa";
 // import {BiEditAlt} from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
 import {PlaygroundContext} from "../../context/PlaygroundContext";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   readonly variant: string;
@@ -83,6 +84,11 @@ const PlaygroundCard = styled.div`
   gap: 1rem;
   box-shadow: 0px 0px 12px -3px rgba(0, 0, 0, 0.35);
   border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  &:hover{
+    opacity: 0.75;
+  }
   img {
     width: 60px;
     height: 60px;
@@ -116,6 +122,7 @@ const Rightpane = () => {
   const PlaygroundFeatures = useContext(PlaygroundContext)!;
   const Folders = PlaygroundFeatures?.folders;
   const {deleteFolder,deleteCard} = PlaygroundFeatures;
+  const navigate = useNavigate();
 
   return (
     
@@ -187,13 +194,15 @@ const Rightpane = () => {
             <CardContainer>
               {Object.entries(folder.items).map(
                 ([cardId, card]: [cardId: string, card: any]) => (
-                  <PlaygroundCard>
+                  <PlaygroundCard onClick={()=>{
+                    navigate(`/code/${folderId}/${cardId}`)
+                  }}>
                     <img src='/logo-small.png' alt='' />
                     <CardContent>
                       <h5>{card.title}</h5>
                       <p>Language: {card.language}</p>
                     </CardContent>
-                    <Icons>
+                    <Icons onClick={(e)=>{e.stopPropagation()}}>
                       <IoTrash
                         onClick={() => {
                           // DELETE CARD

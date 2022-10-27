@@ -8,6 +8,7 @@ import EditCardTitle from "./modalTypes/EditCardTitle";
 import EditFolderTitle from "./modalTypes/EditFolderTitle";
 import NewCard from "./modalTypes/NewCard";
 import NewFolder from "./modalTypes/NewFolder";
+import NewFolderAndPlayground from "./modalTypes/NewFolderAndPlayground";
 
 const ModalContainer = styled.div`
     background: rgba(0,0,0,0.4);
@@ -43,19 +44,24 @@ export const CloseButton = styled.button`
 export const Input = styled.div`
     display: flex;
     align-items: center;
+    // box-sizing: border-box;
     justify-content: space-between;
     padding: 1.5rem 0;
+    height: 5rem;
     gap: 2rem;
-    padding-bottom : 0,
+    // padding-bottom : 0,
     input{
         flex-grow: 1;
         height: 2rem;
     }
     button{
         background: #241f21;
-        height: 2rem;
+        height: 1rem ;
         color: white;
-        padding: 2rem;
+        padding: 0.8rem 0.8rem ;
+        display: flex;
+        align-items: center;
+        border-radius: 5%;
     }
     `;
 
@@ -119,6 +125,9 @@ const Modal = () =>{
                 )}
                 {isOpen.type==="4" &&(
                     <NewFolder closeModal={closeModal} identifier={isOpen.identifier}/>
+                )}
+                {isOpen.type==="5" &&(
+                    <NewFolderAndPlayground closeModal={closeModal} identifier={isOpen.identifier}/>
                 )}
             </ModalContent>
         </ModalContainer>

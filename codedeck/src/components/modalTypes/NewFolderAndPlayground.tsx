@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 const InputSelect = styled.div`
     display: grid;
-    grid-template-columns: 1fr 0,5fr;
+    grid-template-columns: 0.5fr 1fr;
     row-gap: 1rem;
     column-gap: 1rem;
     margin-top: 1.2rem;
@@ -26,11 +26,11 @@ const InputSelect = styled.div`
     }
 `
 
-const NewCard = ({closeModal,identifier}:ModalProps) => {
+const NewFolderAndPlayground = ({closeModal,identifier}:ModalProps) => {
 
   const {folderId} = identifier;
 
-  const {folders,createNewPlayground} = useContext(PlaygroundContext)!;
+  const {folders,createNewFolderAndPlayground} = useContext(PlaygroundContext)!;
   const [title,setTitle] = useState("");
   const languageOptions = [
     {value: "c++", label:"C++"},
@@ -44,6 +44,9 @@ const NewCard = ({closeModal,identifier}:ModalProps) => {
   const handleChangeLanguage=(SelectedOptions: any)=>{
     setLanguage(SelectedOptions);
   }
+
+  const [cardTitle,setCardTitle] = useState("");
+  const [folderTitle,setFolderTitle] = useState("");
   return (
     <div>
     <Header><h2>Create New Folder</h2>
@@ -57,10 +60,13 @@ const NewCard = ({closeModal,identifier}:ModalProps) => {
 
     </Header>
     <InputSelect>
-    <Input><input type='text' value={title} onChange={(e)=>setTitle(e.target.value)} />
+    <label>Enter Folder Name</label>
+    <Input><input type='text' value={cardTitle} onChange={(e)=>setCardTitle(e.target.value)} />
+    <label>Enter Card Name</label>
+    <input type='text' value={folderTitle} onChange={(e)=>setFolderTitle(e.target.value)} />
     <Select value={language} options={languageOptions} onChange={handleChangeLanguage}/> 
 
-    <button onClick={()=>{createNewPlayground(folderId,title,language.value);
+    <button onClick={()=>{createNewFolderAndPlayground(folderTitle,cardTitle,language.value);
     closeModal();}}>Create Playground</button>
     </Input>
     </InputSelect>
@@ -68,4 +74,4 @@ const NewCard = ({closeModal,identifier}:ModalProps) => {
   );
 };
 
-export default NewCard;
+export default NewFolderAndPlayground;

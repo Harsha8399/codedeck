@@ -17,12 +17,11 @@ interface ModalContextType{
     // setIsOpen : (isOpen: PopupFields)=> void,
 }
 
-interface ModalContextType{
-    isOpen: PopupFields;
-    openModal: (value:PopupFields)=>void;
-    closeModal: () => void;
-}
-
+// interface ModalContextType{
+//     isOpen: PopupFields;
+//     openModal: (value:PopupFields)=>void;
+//     closeModal: () => void;
+// }
 
 export const ModalContext = createContext<ModalContextType| null>(null);
 

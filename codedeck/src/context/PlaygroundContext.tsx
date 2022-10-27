@@ -16,6 +16,9 @@ interface PlaygroundContextType{
     editFolderTitle: (folderId: string, newFolderTitle: string) => void;
     deleteCard: (folderId: string, cardId: string) => void;
     deleteFolder: (folderId: string) => void;
+    savePlayground:(
+      folderId: string,cardId: string,newCode: string, newLanguage: string
+    )=> void;
 }
 
 export const PlaygroundContext = createContext<PlaygroundContextType|null>(null);
@@ -34,6 +37,34 @@ export interface FolderType{
   [key:string]:FolderT;
 }
 
+export const languageMap:{
+  [key: string]:{
+    id: number;
+    defaultCode: string;
+  };
+}={
+  "c++":{
+    id: 54,
+    defaultCode:"#include <iostream>\n"+"\n"+
+    "int main() {\n"+
+    "    //your code here\n"+
+    "    return 0;\n"+
+    "}"
+  },
+  python:{
+    id:71,
+    defaultCode:"# python code here"
+  },
+  javascript:{
+    id:63,
+    defaultCode:"// javascript code here"
+  },
+  java:{
+    id: 62,
+    defaultCode: "Your java code here",
+  },
+};
+
 const initialItems = {
   [uuid()]: {
     title: "Folder Title 1",
@@ -41,41 +72,28 @@ const initialItems = {
       [uuid()]: {
         title: "Stack Implementation",
         language: "C++",
+        code:languageMap["c++"].defaultCode,
       },
       [uuid()]: {
         title: "Queue Implementation",
         language: "C++",
+        code:languageMap["c++"].defaultCode,
       },
       [uuid()]: {
         title: "XYZ Implementation",
         language: "C++",
+        code:languageMap["c++"].defaultCode,
       },
     },
-  },
-  [uuid()]: {
-    title: "Folder Title 2",
-    items: {
-      [uuid()]: {
-        title: "1 Implementation",
-        language: "C++",
-      },
-      [uuid()]: {
-        title: "2 Implementation",
-        language: "C++",
-      },
-      [uuid()]: { 
-        title: "3 Implementation",
-        language: "C++",
-      },
-    },
-  }
-}
+  }, 
+};
 
 const PlaygroundProvider = ({children}:{children: any}) => {
   const [folders,setFolders]=useState(()=>{
-    const localData = JSON.parse(
+    let localData = JSON.parse(
       localStorage.getItem("playground-data") as string
     );
+    localData = localData===null || Object.keys(localData).length===0?null:localData;
     return localData || initialItems;
   });
 
@@ -94,21 +112,17 @@ const PlaygroundProvider = ({children}:{children: any}) => {
       };
       return newState;
     });
-  }
+  };
 
   //creating newplayground
 
-  const createNewPlayground = (folderTitle:string,cardTitle:string,cardLanguage:string)=>{
+  const createNewPlayground = (folderId:string,cardTitle:string,cardLanguage:string)=>{
     setFolders((oldstate:any)=>{
       const newState = {...oldstate};
-      newState[uuid()]={
-        title: folderTitle,
-        items:{
-          [uuid()]:{
-            title : cardTitle,
-            language: cardLanguage,
-          },
-        },
+      newState[folderId].items[uuid()]={
+        title: cardTitle,
+        language: cardLanguage,
+        code: languageMap[cardLanguage].defaultCode,
       };
       return newState;
     });
@@ -155,12 +169,28 @@ const PlaygroundProvider = ({children}:{children: any}) => {
           [uuid()]:{
             title: cardTitle,
             language: cardLanguage,
+            code: languageMap[cardLanguage].defaultCode,
           }
         }
       }
       return newState;
     })
   }
+
+  const savePlayground = (
+    folderId: string,
+    cardId: string,
+    newCode: string,
+    newLanguage: string
+  )=>{
+    setFolders((oldState: any)=>{
+      const newState={...oldState};
+      newState[folderId].items[cardId].code = newCode;
+      newState[folderId].items[cardId].language = newLanguage;
+      return newState;
+    })
+  }
+
 
 
 const makeAvailableGlobally: PlaygroundContextType={
@@ -173,6 +203,7 @@ const makeAvailableGlobally: PlaygroundContextType={
     editFolderTitle: editFolderTitle,
     deleteCard: deleteCard,
     deleteFolder: deleteFolder,
+    savePlayground: savePlayground,
 };
 
 return(
