@@ -1,11 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext ,useEffect} from "react";
 import styled from "styled-components";
 import { IoTrash } from "react-icons/io5";
 import { FaEdit } from "react-icons/fa";
 // import {BiEditAlt} from "react-icons/bi";
 import { ModalContext } from "../../context/ModalContext";
-import {PlaygroundContext} from "../../context/PlaygroundContext";
+import { PlaygroundContext } from "../../context/PlaygroundContext";
 import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "../../context/ThemeContext";
 
 interface HeaderProps {
   readonly variant: string;
@@ -33,11 +34,13 @@ const Header = styled.div<HeaderProps>`
 
 const StyledRightPane = styled.div`
   padding: 2rem;
-  background: #fafafa;
+  background: ${({ theme }) => theme.background};
+  color: ${({ theme }) => theme.color};
   position: absolute;
   width: 60%;
   top: 0;
   right: 0;
+  height: 100vh;
 `;
 const Heading = styled.h3<HeadingProps>`
   font-weight: 400;
@@ -69,7 +72,7 @@ const AddButton = styled.button`
 const Folder = styled.div`
   margin-top: 0.5rem;
   margin-bottom: 2rem;
-  `;
+`;
 
 const CardContainer = styled.div`
   display: grid;
@@ -86,7 +89,7 @@ const PlaygroundCard = styled.div`
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.1s ease;
-  &:hover{
+  &:hover {
     opacity: 0.75;
   }
   img {
@@ -112,47 +115,67 @@ const Icons = styled.div`
 const FolderButtons = styled.div`
   display: flex;
   align-items: center;
-  `;
+`;
+
+
 
 const Rightpane = () => {
   const makeAvailableGlobally = useContext(ModalContext)!;
-  const {openModal} = makeAvailableGlobally;
+  const { openModal } = makeAvailableGlobally;
   console.log(openModal);
 
   const PlaygroundFeatures = useContext(PlaygroundContext)!;
   const Folders = PlaygroundFeatures?.folders;
-  const {deleteFolder,deleteCard} = PlaygroundFeatures;
+  const { deleteFolder, deleteCard } = PlaygroundFeatures;
   const navigate = useNavigate();
 
+  const { theme,setTheme } = useContext(ThemeContext)! || {};
+
+
+const changeTheme=()=>{
+  console.log("Darkmode working");
+  const newTheme={
+    background: "black",
+    color: "white",
+  }
+  setTheme(newTheme);
+  console.log(theme);
+}
+  
+
   return (
-    
     <StyledRightPane>
       {/* console.log(openModal); */}
       <Header variant="main">
         <Heading size="large">
           My <span>Playground</span>
         </Heading>
-        
-        {openModal &&<AddButton onClick={()=>{
-          
-          openModal({
-            value: true,
-            type: "4",
-            identifier:{
-              folderId: "",
-              cardId: "",
-            },
-          })
-        }}>
-          <span>+</span>New folder</AddButton>
-}
+        {/* <button onClick={()=>changeTheme()}>Dark Mode</button> */}
+        <input type="checkbox" onChange={changeTheme} value="Dark"/><label>Dark mode</label>
+
+        {openModal && (
+          <AddButton
+            onClick={() => {
+              openModal({
+                value: true,
+                type: "4",
+                identifier: {
+                  folderId: "",
+                  cardId: "",
+                },
+              });
+            }}
+          >
+            <span>+</span>New folder
+          </AddButton>
+        )}
       </Header>
 
       {Object.entries(Folders).map(
         ([folderId, folder]: [folderId: string, folder: any]) => (
           <Folder>
-            <Header variant='folder'>
-              <Heading size='small'>{folder.title}</Heading>
+            <Header variant="folder">
+              <Heading size="small">{folder.title}</Heading>
               <FolderButtons>
                 <Icons>
                   <IoTrash
@@ -194,15 +217,21 @@ const Rightpane = () => {
             <CardContainer>
               {Object.entries(folder.items).map(
                 ([cardId, card]: [cardId: string, card: any]) => (
-                  <PlaygroundCard onClick={()=>{
-                    navigate(`/code/${folderId}/${cardId}`)
-                  }}>
-                    <img src='/logo-small.png' alt='' />
+                  <PlaygroundCard
+                    onClick={() => {
+                      navigate(`/code/${folderId}/${cardId}`);
+                    }}
+                  >
+                    <img src="/logo-small.png" alt="" />
                     <CardContent>
                       <h5>{card.title}</h5>
                       <p>Language: {card.language}</p>
                     </CardContent>
-                    <Icons onClick={(e)=>{e.stopPropagation()}}>
+                    <Icons
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
                       <IoTrash
                         onClick={() => {
                           // DELETE CARD
